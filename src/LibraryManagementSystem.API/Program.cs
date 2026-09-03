@@ -2,6 +2,7 @@ using LibraryManagementSystem.DataAccess.Data;
 using LibraryManagementSystem.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using LibraryManagementSystem.Business.Services;
+using LibraryManagementSystem.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,11 +25,16 @@ builder.Services.AddScoped<ILoanService, LoanService>();
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails(); // Supports standard ASP.NET Core error JSON format
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseExceptionHandler(); // Must be placed first in the pipeline to catch everything downstream
 
 if (app.Environment.IsDevelopment())
 {
