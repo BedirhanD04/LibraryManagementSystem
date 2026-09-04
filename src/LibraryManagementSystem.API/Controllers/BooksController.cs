@@ -45,4 +45,24 @@ public class BooksController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<BookDto>> Update(int id, [FromBody] CreateBookDto dto)
+    {
+        var updated = await _bookService.UpdateAsync(id, dto);
+        if (updated == null)
+            return NotFound();
+
+        return Ok(updated);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _bookService.DeleteAsync(id);
+        if (!deleted)
+            return NotFound();
+
+        return NoContent();
+    }
 }

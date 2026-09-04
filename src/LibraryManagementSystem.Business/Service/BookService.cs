@@ -60,6 +60,38 @@ public class BookService : IBookService
         return MapToDto(book, author.Name);
     }
 
+    public async Task<BookDto?> UpdateAsync(int id, CreateBookDto dto)
+    {
+        var book = await _bookRepository.GetByIdAsync(id);
+        if (book == null) return null;
+
+        // Business rule: verify that the specified AuthorId exists
+        var author = await _authorRepository.GetByIdAsync(dto.AuthorId);
+        if (author == null)
+            throw new InvalidOperationException($"Author with ID {dto.AuthorId} does not exist.");
+        
+
+        book.Title = dto.Title;
+        book.ISBN = dto.ISBN;
+        book.TotalCopies = dto.TotalCopies;
+        book.AuthorId = dto.AuthorId;
+
+         _bookRepository.Update(book);
+        await _bookRepository.SaveChangesAsync();
+
+        return MapToDto(book, author.Name);
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var book = await _bookRepository.GetByIdAsync(id);
+        if (book == null) return false;
+
+        _bookRepository.Remove(book);
+        await _bookRepository.SaveChangesAsync();
+        return true;
+    }
+
     private static BookDto MapToDto(Book book, string authorName) => new()
     {
         Id = book.Id,

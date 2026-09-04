@@ -40,6 +40,31 @@ public class MemberService : IMemberService
         return MapToDto(member);
     }
 
+    public async Task<MemberDto?> UpdateAsync(int id, CreateMemberDto dto)
+    {
+        var member = await _memberRepository.GetByIdAsync(id);
+        if (member == null) return null;
+
+        member.Name = dto.Name;
+        member.Email = dto.Email;
+
+        _memberRepository.Update(member);
+        await _memberRepository.SaveChangesAsync();
+
+        return MapToDto(member);
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var member = await _memberRepository.GetByIdAsync(id);
+        if (member == null) return false;
+
+        _memberRepository.Remove(member);
+        await _memberRepository.SaveChangesAsync();
+
+        return true;
+    }
+
     // Centralizing Entity -> DTO mapping in one place to prevent code duplication
     private static MemberDto MapToDto(Member member) => new()
     {

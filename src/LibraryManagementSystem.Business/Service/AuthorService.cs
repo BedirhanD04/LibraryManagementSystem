@@ -40,13 +40,38 @@ public class AuthorService : IAuthorService
 
     }
 
+    public async Task<AuthorDto?> UpdateAsync(int id, CreateAuthorDto dto)
+    {
+        var author = await _authorRepository.GetByIdAsync(id);
+        if (author == null)return null;
+
+        author.Name = dto.Name;
+        author.DateOfBirth = dto.DateOfBirth;
+
+        _authorRepository.Update(author);
+        await _authorRepository.SaveChangesAsync();
+
+        return MapToDto(author);
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var author = await _authorRepository.GetByIdAsync(id);
+        if (author == null) return false;
+
+        _authorRepository.Remove(author);
+        await _authorRepository.SaveChangesAsync();
+
+        return true;
+    }
+
     // Centralizing Entity -> DTO mapping in one place to prevent code duplication
     private static AuthorDto MapToDto(Author author) => new()
-    {
+   {
         Id = author.Id,
         Name = author.Name,
         DateOfBirth = author.DateOfBirth
-    };
+    }; 
     
        
 }    

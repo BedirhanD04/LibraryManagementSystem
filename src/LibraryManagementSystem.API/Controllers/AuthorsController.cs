@@ -40,4 +40,35 @@ public class AuthorsController : ControllerBase
         // 201 Created + "Location" header pointing to GetById (REST standard)
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<AuthorDto>> Update(int id, [FromBody] CreateAuthorDto dto)
+    {
+        var updated = await _authorService.UpdateAsync(id, dto);
+        if (updated == null)
+            return NotFound();
+        
+        return Ok(updated);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+    try
+    {
+        var deleted = await _authorService.DeleteAsync(id);
+        if (!deleted)
+            return NotFound();
+
+        return NoContent();
+    }
+    catch (InvalidOperationException ex)
+    {
+        return BadRequest(new { message = ex.Message });
+    }
+}
+
+
+
+    
 }

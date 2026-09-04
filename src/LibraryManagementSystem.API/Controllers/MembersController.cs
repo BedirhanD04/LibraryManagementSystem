@@ -38,4 +38,24 @@ public class MembersController : ControllerBase
         var created = await _memberService.CreateAsync(dto);
         return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
     }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<MemberDto>> Update(int id, [FromBody] CreateMemberDto dto)
+    {
+        var updated = await _memberService.UpdateAsync(id, dto);
+        if (updated == null)
+            return NotFound();
+        
+        return Ok(updated);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _memberService.DeleteAsync(id);
+        if (!deleted)
+            return NotFound();
+        
+        return NoContent(); // 204
+    }
 }
